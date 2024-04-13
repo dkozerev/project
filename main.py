@@ -1,5 +1,6 @@
 import pygame
-import sys
+import os
+import random
 
 pygame.init()
 
@@ -9,12 +10,13 @@ fps = 60
 
 window = pygame.display.set_mode((win_w, win_h))
 clock = pygame.time.Clock()
-background = pygame.image.load("country-platform-preview.png")
+background = pygame.image.load("img/country-platform-preview.png")
 background = pygame.transform.scale(background, (win_w, win_h))
 
-pygame.mixer_music.load("awesomeness.wav")
+pygame.mixer_music.load("img/awesomeness.wav")
 pygame.mixer_music.play(-1)
 pygame.mixer_music.set_volume(0.2)
+
 
 
 class GameSprite:
@@ -25,28 +27,57 @@ class GameSprite:
     
     def update(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
+        print(self.rect.x,self.rect.y)
 
 
-class Pers(GameSprite):
-    def __init__(self, x, y, w, h, image, speed):
+
+class Player(GameSprite):
+
+    def __init__(self,x, y, w, h, image, speed):
         super().__init__(x, y, w, h, image)
         self.speed = speed
+        self.image = image
+        #self.image.set_colorkey(0)
+        self.isJump = False
+        self.jumpCount = 10
 
-    def move(self, key_left, key_right):
-        k = pygame.key.get_pressed()
-        if k[key_right]:
-            if self.rect.right <= win_w:
-                self.rect.x += self.speed 
-        elif k[key_left]:
-            if self.rect.left >= 0:
-                self.rect.x -= self.speed
+    def move(self):
+        keys = pygame.key.get_pressed()
+        
+        if (keys[pygame.K_a]) and (self.rect.x >= 0):
+            self.rect.x -= self.speed
+            #self.image = 
+            #self.image.set_colorkey(0)
+            print(2)
+
+        if (keys[pygame.K_d]) and (self.rect.x <= 1145):
+            self.rect.x += self.speed
+            #self.image = hero
+            #self.image.set_colorkey(0)
+            print(3)
+        if keys[pygame.K_SPACE]:
+            self.isJump = True
+            print(1)
+
+        if self.isJump:
+
+            if self.jumpCount >= -10:
+
+                if self.jumpCount < 0:
+                    self.rect.y += (self.jumpCount ** 2) / 2
+                else:
+                    self.rect.y -= (self.jumpCount ** 2) / 2
+
+                self.jumpCount -= 1
+
+            else:
+                self.isJump = False
+                self.jumpCount = 10
 
 
-animation_set = [pygame.image.load(f"{i}.png") for i in range(1, 4)]
+player1 = pygame.image.load("img/1.png")
+hero = Player(400,0, 50, 50, player1, 5)
 
-current_frame = 0
-frame_counter = 0
-player = Pers(100, 100, 50, 50, pygame.image.load("1.png"), 5)
 
 game = True
 while game:
@@ -56,18 +87,12 @@ while game:
         if event.type == pygame.QUIT:
             game = False
 
-    player.move(pygame.K_LEFT, pygame.K_RIGHT)
-    player.update()
+    hero.update()
+    hero.move()
+    
 
-    frame_counter += 1
-    if frame_counter >= fps:
-        frame_counter = 0
-        current_frame = (current_frame + 1) % len(animation_set)
-
-    window.blit(animation_set[current_frame], (player.rect.x, player.rect.y))
-
+    pygame.display.flip()
     pygame.display.update()
     clock.tick(fps)
 
 pygame.quit()
-sys.exit()

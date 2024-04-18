@@ -17,6 +17,8 @@ pygame.mixer_music.load("awesomeness.wav")
 pygame.mixer_music.play(-1)
 pygame.mixer_music.set_volume(0.2)
 
+font1 = pygame.font.SysFont("Arial", 20)
+font2 = pygame.font.SysFont("Arial", 50)
 
 
 class GameSprite:
@@ -75,24 +77,41 @@ class Player(GameSprite):
                 self.jumpCount = 10
             if not any(block.rect.colliderect(self.rect.move(0, 1)) for block in blocks):
                 self.rect.y += 5  # Скорость спуска
-            # Проверяем, что игрок не спускается ниже, чем верхняя граница блока или платформы
+    # Проверяем, что игрок не спускается ниже, чем верхняя граница блока или платформы
                 for block in blocks:
                     if self.rect.colliderect(block.rect) and self.rect.bottom > block.rect.top:
                         self.rect.bottom = block.rect.top
-
+        if self.rect.y < 0:
+                self.rect.y = 0
+        elif self.rect.y > win_h - self.rect.height - 95:  # Отступ от нижней границы окна
+            self.rect.y = win_h - self.rect.height - 95
+    
 class Block(GameSprite):
     def __init__(self, x, y, w, h, image):
         super().__init__(x, y, w, h, image)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+    
+
+
+
+
+
+
+
 # Создаем экземпляры блоков и добавляем их в список blocks
+coin_img = pygame.image.load("coin.png")
 block_img = pygame.image.load("block.png")
-block1 = Block(200, 350, 50, 50, block_img)
-block2 = Block(290, 290, 50, 50, block_img)
-block3 = Block(380, 230, 50, 50, block_img)
-block4 = Block(470, 170, 50, 50, block_img)
-blocks = [block1, block2, block3, block4]
+block1 = Block(190, 350, 50, 50, block_img)
+block2 = Block(280, 290, 50, 50, block_img)
+block3 = Block(370, 230, 50, 50, block_img)
+block4 = Block(460, 170, 50, 50, block_img)
+block5 = Block(550, 120, 50, 50, block_img)
+block6 = Block(600, 120, 50, 50, block_img)
+block7 = Block(650, 120, 50, 50, block_img)
+coin = Block(650, 70, 50, 50, coin_img)
+blocks = [block1, block2, block3, block4,block5,block6,block7,coin]
 
 
 
@@ -100,8 +119,8 @@ blocks = [block1, block2, block3, block4]
 player1 = pygame.image.load("1.png")
 hero = Player(10,350, 50, 50, player1, 3)
 
-
 game = True
+game_over = False
 while game:
 
     window.blit(background, (0, 0))
@@ -114,6 +133,8 @@ while game:
     hero.update()
     hero.move()
 
+
+
     for block in blocks:
         block.update()
         window.blit(block.image, (block.rect.x, block.rect.y))
@@ -123,9 +144,11 @@ while game:
                 hero.rect.bottom = block.rect.top
                 hero.isJump = False
                 hero.jumpCount = 10
+    if hero.rect.collidepoint(coin.rect.center):  # Проверка столкновения с монеткой
+        game_over = True
+    if game_over:
+        window.blit(font2.render("Победа!", True, (0, 255, 0)), (250, 250))
 
-
-    pygame.display.update()
     clock.tick(fps)
-
+    pygame.display.update()
 pygame.quit()

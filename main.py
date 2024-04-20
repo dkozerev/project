@@ -218,27 +218,27 @@ while game:
                 if btn_menu2.rect.collidepoint(x, y):
 
                     screen = "menu"
-    hero.collide_block()
-    hero.update()
-    hero.move()
-    coin.update()
-
-
-    for block in blocks:
-        block.update()
-
-
-    for coin in coins:
+        hero.collide_block()
+        hero.update()
+        hero.move()
         coin.update()
-        if hero.rect.colliderect(coin.rect):
-            coins.remove(coin) 
-
-
-
-    if hero.rect.collidepoint(coin.rect.center):  # Проверка столкновения с монеткой
-        game_over = True
-    if game_over:
-        window.blit(font2.render("Победа!", True, (0,191,255)), (250, 20))
+    
+    
+        for block in blocks:
+            block.update()
+    
+    
+        for coin in coins:
+            coin.update()
+            if hero.rect.colliderect(coin.rect):
+                coins.remove(coin) 
+    
+    
+    
+        if hero.rect.collidepoint(coin.rect.center):  # Проверка столкновения с монеткой
+            game_over = True
+        if game_over:
+            window.blit(font2.render("Победа!", True, (0,191,255)), (250, 20))
 
 
     clock.tick(fps)
